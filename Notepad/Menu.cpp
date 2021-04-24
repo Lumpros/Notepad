@@ -1,62 +1,33 @@
 #include "Menu.h"
 #include "Controls.h"
+#include "Resource.h"
 
-CHOOSEFONT GetChooseFontFromDialog(HWND hWnd)
+#include "FileMenu.h"
+#include "EditMenu.h"
+#include "FormatMenu.h"
+
+inline static BOOL IsInRange(INT16 val, INT16 left_incl, INT16 right_incl)
 {
-	CHOOSEFONT cf = { 0 };
-	LOGFONT lf = { 0 };
-	static LOGFONT oldlf;
-	static bool initialized = false;
-
-	cf.lStructSize = sizeof(CHOOSEFONT);
-	cf.hwndOwner = hWnd;
-	cf.nFontType = SCREEN_FONTTYPE;
-	cf.Flags =  CF_INITTOLOGFONTSTRUCT;
-	cf.rgbColors = RGB(0, 0, 0);
-
-	/* Do all this dumb stuff to save previous choices */
-	if (initialized)
-	{
-		cf.lpLogFont = &oldlf;
-		lstrcpyW(cf.lpLogFont->lfFaceName, oldlf.lfFaceName);
-	}
-
-	else
-	{
-		cf.lpLogFont = &lf;
-		cf.lpLogFont->lfHeight = 20;
-		lstrcpyW(cf.lpLogFont->lfFaceName, DEFAULT_FONT_STR);
-	}
-
-	ChooseFont(&cf);
-
-	if (!initialized)
-	{
-		oldlf = lf;
-		initialized = true;
-	}
-
-	return cf;
-}
-
-static void SetTextEditFont(HWND hWnd)
-{
-	CHOOSEFONT cf = GetChooseFontFromDialog(hWnd);
-	HFONT hFont = CreateFontIndirect(cf.lpLogFont);
-	SendMessage(text_edit_handle, WM_SETFONT, (WPARAM)hFont, NULL);
+	return (val >= left_incl && val <= right_incl);
 }
 
 void HandleMenuCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	switch (LOWORD(wParam))
-	{
-	case IDM_FILE_EXIT:
-		PostQuitMessage(EXIT_SUCCESS);
-		break;
+	WPARAM ID = LOWORD(wParam);
 
-	case IDM_FORMAT_FONT: 
-		SetTextEditFont(hWnd);
-		break;
+	if (IsInRange(ID, IDM_FILE_NEW, IDM_FILE_EXIT))
+	{
+		HandleFileMenu(hWnd, wParam, lParam);
+	}
+
+	else if (IsInRange(ID, IDM_EDIT_UNDO, IDM_EDIT_FIND_PREV) || IsInRange(ID, IDM_EDIT_REPLACE, IDM_EDIT_TIME_DATE))
+	{
+		HandleEditMenu(hWnd, wParam, lParam);
+	}
+
+	else if (IsInRange(ID, IDM_FORMAT_WORDWRAP, IDM_FORMAT_FONT))
+	{
+		HandleFormatMenu(hWnd, wParam, lParam);
 	}
 }
 
@@ -64,16 +35,16 @@ static void InitializeFileSubmenu(HMENU hMenu)
 {
 	HMENU hFileSubmenu = CreatePopupMenu();
 
-	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_NEW, L"New\t\tCtrl+N");
-	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_NEW_WINDOW, L"New Window\t\tCtrl+Shift+N");
-	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_OPEN, L"Open...\t\tCtrl+O");
-	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_SAVE, L"Save\t\tCtrl+S");
-	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_SAVE_AS, L"Save as...\t\tCtrl+Shift+S");
+	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_NEW, L"New\tCtrl+N");
+	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_NEW_WINDOW, L"New Window\tCtrl+Shift+N");
+	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_OPEN, L"Open...\tCtrl+O");
+	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_SAVE, L"Save\tCtrl+S");
+	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_SAVE_AS, L"Save as...\tCtrl+Shift+S");
 	AppendMenu(hFileSubmenu, MF_SEPARATOR, NULL, NULL);
 	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_PAGE_SETUP, L"Page Setup");
-	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_PRINT, L"Print...\t\tCtrl+P");
+	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_PRINT, L"Print...\tCtrl+P");
 	AppendMenu(hFileSubmenu, MF_SEPARATOR, NULL, NULL);
-	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_EXIT, L"Exit");
+	AppendMenu(hFileSubmenu, MF_STRING, IDM_FILE_EXIT, L"E&xit");
 
 	AppendMenu(hMenu, MF_POPUP | MF_STRING, (UINT)hFileSubmenu, L"&File");
 }
@@ -107,7 +78,7 @@ static void InitializeFormatSubmenu(HMENU hMenu)
 	HMENU hFormatSubmenu = CreatePopupMenu();
 
 	AppendMenu(hFormatSubmenu, MF_STRING, IDM_FORMAT_WORDWRAP, L"Word Wrap");
-	AppendMenu(hFormatSubmenu, MF_STRING, IDM_FORMAT_FONT, L"Font");
+	AppendMenu(hFormatSubmenu, MF_STRING | MF_UNCHECKED, IDM_FORMAT_FONT, L"Font");
 
 	AppendMenu(hMenu, MF_POPUP | MF_STRING, (UINT)hFormatSubmenu, L"F&ormat");
 }
@@ -119,9 +90,9 @@ static void InitializeViewSubmenu(HMENU hMenu)
 
 	AppendMenu(hViewZoomSubmenu, MF_STRING, IDM_VIEW_ZOOM_IN, L"Zoom In\tCtrl+Plus");
 	AppendMenu(hViewZoomSubmenu, MF_STRING, IDM_VIEW_ZOOM_OUT, L"Zoom Out\tCtrl+Minus");
-	AppendMenu(hViewZoomSubmenu, MF_STRING, IDM_VIEW_RESTORE, L"Zoom Out\tCtrl+0");
+	AppendMenu(hViewZoomSubmenu, MF_STRING, IDM_VIEW_RESTORE, L"Restore Default Zoom\tCtrl+0");
 	AppendMenu(hViewSubmenu, MF_POPUP | MF_STRING, (UINT)hViewZoomSubmenu, L"Zoom");
-	AppendMenu(hViewSubmenu, MF_STRING, (UINT)hViewZoomSubmenu, L"Status Bar");
+	AppendMenu(hViewSubmenu, MF_STRING, IDM_VIEW_STATUS, L"Status Bar");
 
 	AppendMenu(hMenu, MF_POPUP | MF_STRING, (UINT)hViewSubmenu, L"&View");
 }
