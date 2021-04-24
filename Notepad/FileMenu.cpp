@@ -55,7 +55,7 @@ static void HandleOpenFile(HWND hWnd)
 
 			do {
 				read_result = ReadFile(hFile, buf, sizeof(buf), &bytes_read, NULL);
-				AppendText(buf);
+				AppendText(buf, hWnd);
 			} while (!read_result && bytes_read != 0);
 
 			CloseHandle(hFile);

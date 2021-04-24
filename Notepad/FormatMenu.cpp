@@ -42,7 +42,7 @@ static void SetTextEditFont(HWND hWnd)
 {
 	CHOOSEFONT cf = GetChooseFontFromDialog(hWnd);
 	HFONT hFont = CreateFontIndirect(cf.lpLogFont);
-	SendMessage(text_edit_handle, WM_SETFONT, (WPARAM)hFont, NULL);
+	SendMessage(GetDlgItem(hWnd, IDC_TEXT_EDIT), WM_SETFONT, (WPARAM)hFont, NULL);
 	InvalidateRect(hWnd, NULL, FALSE);
 }
 

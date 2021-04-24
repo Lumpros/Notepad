@@ -70,7 +70,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	case WM_SIZE:
 		int width = LOWORD(lParam);
 		int height = HIWORD(lParam);
-		SetWindowPos(text_edit_handle, HWND_TOP, 0, 0, width, height, SWP_SHOWWINDOW);
+		SetWindowPos(GetDlgItem(hWnd, IDC_TEXT_EDIT), HWND_TOP, 0, 0, width, height, SWP_SHOWWINDOW);
 		return 0;
 	}
 

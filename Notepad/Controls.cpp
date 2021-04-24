@@ -2,8 +2,6 @@
 
 #include <CommCtrl.h>
 
-HWND text_edit_handle = NULL;
-
 void CreateControls(HWND hWnd)
 {
 	HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
@@ -12,7 +10,7 @@ void CreateControls(HWND hWnd)
 	RECT clientRect;
 	GetClientRect(hWnd, &clientRect);
 	
-	text_edit_handle = CreateWindowEx(
+	HWND text_edit_handle = CreateWindowEx(
 		ES_EX_ZOOMABLE,
 		L"Edit",
 		NULL,

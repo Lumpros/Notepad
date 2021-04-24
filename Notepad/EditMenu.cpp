@@ -4,20 +4,30 @@
 
 #include <time.h>
 
-void AppendText(LPCWSTR newText)
+void AppendText(LPCWSTR newText, HWND mainhWnd)
 {
-	HWND hwndOutput = text_edit_handle;
-	DWORD StartPos, EndPos;
+	HWND hwndOutput = GetDlgItem(mainhWnd, IDC_TEXT_EDIT);
+	DWORD startPos, endPos;
 
-	SendMessage(hwndOutput, EM_GETSEL, reinterpret_cast<WPARAM>(&StartPos), reinterpret_cast<WPARAM>(&EndPos));
+	SendMessage(hwndOutput, EM_GETSEL, reinterpret_cast<WPARAM>(&startPos), reinterpret_cast<LPARAM>(&endPos));
 
 	int outLength = GetWindowTextLength(hwndOutput);
 
 	SendMessage(hwndOutput, EM_SETSEL, outLength, outLength);
 	SendMessage(hwndOutput, EM_REPLACESEL, TRUE, reinterpret_cast<LPARAM>(newText));
+	SendMessage(hwndOutput, EM_SETSEL, startPos, endPos);
 }
 
-static void AppendSystemTime(void)
+void InsertText(LPCWSTR newText, HWND mainhWnd)
+{
+	HWND hwndOutput = GetDlgItem(mainhWnd, IDC_TEXT_EDIT);
+
+	int outLength = GetWindowTextLength(hwndOutput);
+
+	SendMessage(hwndOutput, EM_REPLACESEL, TRUE, reinterpret_cast<LPARAM>(newText));
+}
+
+static void InsertSystemTime(HWND hWnd)
 {
 	time_t t = time(NULL);
 	struct tm localtm = *localtime(&t);
@@ -27,7 +37,36 @@ static void AppendSystemTime(void)
 		localtm.tm_min, localtm.tm_sec,
 		localtm.tm_year + 1900, localtm.tm_mon + 1,
 		localtm.tm_mday);
-	AppendText(date);
+	InsertText(date, hWnd);
+}
+
+static void Undo(HWND hWnd)
+{
+	SendMessage(GetDlgItem(hWnd, IDC_TEXT_EDIT), EM_UNDO, NULL, NULL);
+}
+
+static void Paste(HWND hWnd)
+{
+	if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
+		return;
+
+	if (!OpenClipboard(hWnd))
+		return;
+
+	HGLOBAL hClipboard = GetClipboardData(CF_UNICODETEXT);
+
+	if (hClipboard != NULL)
+	{
+		LPWSTR data = (LPWSTR)GlobalLock(hClipboard);
+
+		if (data != NULL)
+		{
+			InsertText(data, hWnd);
+			GlobalUnlock(data);
+		}
+	}
+
+	CloseClipboard();
 }
 
 void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -35,7 +74,15 @@ void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	switch (LOWORD(wParam))
 	{
 	case IDM_EDIT_TIME_DATE:
-		AppendSystemTime();
+		InsertSystemTime(hWnd);
+		break;
+
+	case IDM_EDIT_UNDO:
+		Undo(hWnd);
+		break;
+
+	case IDM_EDIT_PASTE:
+		Paste(hWnd);
 		break;
 	}
 }
