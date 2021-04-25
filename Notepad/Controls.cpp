@@ -2,6 +2,7 @@
 #include "Identifiers.h"
 
 #include <CommCtrl.h>
+#include <Richedit.h>
 
 #define SIZEOF_ARR(arr)	sizeof(arr) / sizeof(arr[0])
 
@@ -51,12 +52,25 @@ static UINT GetStatusBarHeight(HWND hWnd)
 
 static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
 {
+	LPCWSTR editclass;
+
+	if (LoadLibrary(L"Msftedit.dll") != NULL)
+	{
+		editclass = MSFTEDIT_CLASS;
+	}
+
+	else
+	{
+		MessageBox(NULL, L"Failed to load Msftedit.dll! Zooming in/out will not available!", L"Warning", MB_OK | MB_ICONEXCLAMATION);
+		editclass = L"Edit";
+	}
+
 	RECT clientRect;
 	GetClientRect(hWnd, &clientRect);
 
 	HWND editControlHandle = CreateWindowEx(
 		ES_EX_ZOOMABLE,
-		L"Edit",
+		editclass,
 		NULL,
 		WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT |
 		ES_MULTILINE | ES_AUTOVSCROLL | WS_HSCROLL,
@@ -68,6 +82,11 @@ static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
 		hInstance,
 		NULL
 	);
+
+	if (lstrcmpW(editclass, MSFTEDIT_CLASS) == 0)
+	{
+		SendMessage(editControlHandle, EM_SETZOOM, 10, 9);
+	}
 
 	return editControlHandle;
 }

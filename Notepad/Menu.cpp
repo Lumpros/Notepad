@@ -8,7 +8,7 @@
 #include "ViewMenu.h"
 #include "AboutMenu.h"
 
-inline static BOOL IsInRange(INT16 val, INT16 left_incl, INT16 right_incl)
+inline static BOOL IsInRange(WORD val, WORD left_incl, WORD right_incl)
 {
 	return (val >= left_incl && val <= right_incl);
 }
@@ -37,7 +37,7 @@ void HandleMenuCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		HandleAboutMenu(hWnd, wParam, lParam);
 	}
 
-	else if (IsInRange(ID, IDM_VIEW_ZOOM, IDM_VIEW_STATUS))
+	else if (IsInRange(ID, IDM_VIEW_ZOOM_IN, IDM_VIEW_RESTORE) || (ID == (WORD)IDM_VIEW_STATUS))
 	{
 		HandleViewMenu(hWnd, wParam, lParam);
 	}
