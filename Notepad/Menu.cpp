@@ -1,10 +1,12 @@
 #include "Menu.h"
 #include "Controls.h"
-#include "Resource.h"
+#include "Identifiers.h"
 
 #include "FileMenu.h"
 #include "EditMenu.h"
 #include "FormatMenu.h"
+#include "ViewMenu.h"
+#include "AboutMenu.h"
 
 inline static BOOL IsInRange(INT16 val, INT16 left_incl, INT16 right_incl)
 {
@@ -28,6 +30,16 @@ void HandleMenuCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	else if (IsInRange(ID, IDM_FORMAT_WORDWRAP, IDM_FORMAT_FONT))
 	{
 		HandleFormatMenu(hWnd, wParam, lParam);
+	}
+
+	else if (IsInRange(ID, IDM_HELP_VIEW, IDM_HELP_ABOUT))
+	{
+		HandleAboutMenu(hWnd, wParam, lParam);
+	}
+
+	else if (IsInRange(ID, IDM_VIEW_ZOOM, IDM_VIEW_STATUS))
+	{
+		HandleViewMenu(hWnd, wParam, lParam);
 	}
 }
 
@@ -95,6 +107,8 @@ static void InitializeViewSubmenu(HMENU hMenu)
 	AppendMenu(hViewSubmenu, MF_STRING, IDM_VIEW_STATUS, L"Status Bar");
 
 	AppendMenu(hMenu, MF_POPUP | MF_STRING, (UINT)hViewSubmenu, L"&View");
+
+	CheckMenuItem(hViewSubmenu, IDM_VIEW_STATUS, MF_CHECKED);
 }
 
 static void InitializeHelpSubmenu(HMENU hMenu)

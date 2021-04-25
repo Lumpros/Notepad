@@ -1,14 +1,16 @@
 #include "FormatMenu.h"
 #include "Controls.h"
-#include "Resource.h"
+#include "Identifiers.h"
 
 CHOOSEFONT GetChooseFontFromDialog(HWND hWnd)
 {
-	CHOOSEFONT cf = { 0 };
-	LOGFONT lf = { 0 };
+	CHOOSEFONT cf;
+	LOGFONT lf;
 
 	static LOGFONT oldlf;
 	static bool initialized = false;
+
+	ZeroMemory(&cf, sizeof(cf));
 
 	cf.lStructSize = sizeof(CHOOSEFONT);
 	cf.hwndOwner = hWnd;
@@ -32,7 +34,8 @@ CHOOSEFONT GetChooseFontFromDialog(HWND hWnd)
 		lstrcpyW(cf.lpLogFont->lfFaceName, DEFAULT_FONT_STR);
 
 		ChooseFont(&cf);
-		oldlf = lf;
+
+		oldlf = *cf.lpLogFont;
 	}
 
 	return cf;
@@ -42,6 +45,7 @@ static void SetTextEditFont(HWND hWnd)
 {
 	CHOOSEFONT cf = GetChooseFontFromDialog(hWnd);
 	HFONT hFont = CreateFontIndirect(cf.lpLogFont);
+
 	SendMessage(GetDlgItem(hWnd, IDC_TEXT_EDIT), WM_SETFONT, (WPARAM)hFont, NULL);
 	InvalidateRect(hWnd, NULL, FALSE);
 }

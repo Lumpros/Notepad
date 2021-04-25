@@ -1,5 +1,5 @@
 #include "EditMenu.h"
-#include "Resource.h"
+#include "Identifiers.h"
 #include "Controls.h"
 
 #include <time.h>

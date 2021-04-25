@@ -2,7 +2,11 @@
 
 #include <Windows.h>
 
-#define IDC_TEXT_EDIT 1
 #define DEFAULT_FONT_STR L"Consolas"
 
 void CreateControls(HWND hWnd);
+
+void HandleWindowResize(HWND hWnd, WPARAM wParam, LPARAM lParam);
+
+void EnableStatusBar(HWND hWnd);
+void DisableStatusBar(HWND hWnd);

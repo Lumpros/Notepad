@@ -2,6 +2,10 @@
 
 #include "Controls.h"
 #include "Menu.h"
+#include "Resource.h"
+#include "Identifiers.h"
+
+#include <CommCtrl.h>
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' " \
 	"version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -10,6 +14,8 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
+	InitCommonControls();
+	
 	LPCWSTR class_name = L"MainWindow";
 	WNDCLASS wc = { 0 };
 	
@@ -68,9 +74,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		return 0;
 
 	case WM_SIZE:
-		int width = LOWORD(lParam);
-		int height = HIWORD(lParam);
-		SetWindowPos(GetDlgItem(hWnd, IDC_TEXT_EDIT), HWND_TOP, 0, 0, width, height, SWP_SHOWWINDOW);
+		HandleWindowResize(hWnd, wParam, lParam);
 		return 0;
 	}
 

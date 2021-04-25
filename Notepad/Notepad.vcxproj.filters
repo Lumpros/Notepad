@@ -33,6 +33,12 @@
     <ClCompile Include="FormatMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AboutMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Controls.h">
@@ -41,7 +47,7 @@
     <ClInclude Include="Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
+    <ClInclude Include="Identifiers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FileMenu.h">
@@ -53,6 +59,15 @@
     <ClInclude Include="FormatMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Notepad.rc">
@@ -61,6 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Downloads\Notepad.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\1100.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

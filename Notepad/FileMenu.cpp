@@ -1,6 +1,6 @@
 #include "FileMenu.h"
 #include "EditMenu.h"
-#include "Resource.h"
+#include "Identifiers.h"
 
 static LPWSTR GetOpenfilenameStructFromDialog(HWND hWnd, BOOL* success)
 {
@@ -23,6 +23,25 @@ static LPWSTR GetOpenfilenameStructFromDialog(HWND hWnd, BOOL* success)
 	return lpstrFile;
 }
 
+static void ShowFileOpenError(LPWSTR filename)
+{
+	WCHAR buf[300];
+	wsprintf(buf, L"Unable to open %s for reading", filename);
+	MessageBox(NULL, buf, L"Error", MB_OK | MB_ICONERROR);
+}
+
+static void SetEditControlTextToFileData(HANDLE hFile, HWND hWnd)
+{
+	WCHAR buf[32];
+	DWORD bytes_read;
+	BOOL read_result;
+
+	do {
+		read_result = ReadFile(hFile, buf, sizeof(buf), &bytes_read, NULL);
+		AppendText(buf, hWnd);
+	} while (!read_result && bytes_read != 0);
+}
+
 static void HandleOpenFile(HWND hWnd)
 {
 	BOOL success;
@@ -31,38 +50,25 @@ static void HandleOpenFile(HWND hWnd)
 	if (success)
 	{
 		HANDLE hFile = CreateFile(
-			filename,
-			GENERIC_READ,
-			0,
-			NULL,
-			OPEN_EXISTING,
+			filename, GENERIC_READ,
+			0, NULL, OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL,
 			NULL
 		);
 
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
-			WCHAR buf[300];
-			wsprintf(buf, L"Unable to open %s for reading", filename);
-			MessageBox(NULL, buf, L"Error", MB_OK | MB_ICONERROR);
+			ShowFileOpenError(filename);
 		}
 
 		else
 		{
-			WCHAR buf[32];
-			DWORD bytes_read;
-			BOOL read_result;
-
-			do {
-				read_result = ReadFile(hFile, buf, sizeof(buf), &bytes_read, NULL);
-				AppendText(buf, hWnd);
-			} while (!read_result && bytes_read != 0);
-
+			SetEditControlTextToFileData(hFile, hWnd);
 			CloseHandle(hFile);
 		}
-
-		delete[] filename;
 	}
+
+	delete[] filename;
 }
 
 static void CreateNewNotepadProcess(void)
