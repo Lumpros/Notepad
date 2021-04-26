@@ -86,3 +86,45 @@ void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 }
+
+void EnableTextEditMenuItems(HWND hWnd, BOOL enabled)
+{
+	HMENU hMenu = GetMenu(hWnd);
+
+	if (hMenu == NULL)
+		return;
+
+	UINT uEnable = enabled ? MF_ENABLED : (MF_GRAYED | MF_DISABLED);
+
+	uEnable |= MF_BYCOMMAND;
+
+	EnableMenuItem(hMenu, IDM_EDIT_UNDO, uEnable);
+	EnableMenuItem(hMenu, IDM_EDIT_CUT, uEnable);
+	EnableMenuItem(hMenu, IDM_EDIT_COPY, uEnable);
+	EnableMenuItem(hMenu, IDM_EDIT_DELETE, uEnable);
+	EnableMenuItem(hMenu, IDM_EDIT_SEARCH, uEnable);
+	EnableMenuItem(hMenu, IDM_EDIT_FIND, uEnable);
+	EnableMenuItem(hMenu, IDM_EDIT_FIND_NEXT, uEnable);
+	EnableMenuItem(hMenu, IDM_EDIT_FIND_PREV, uEnable);
+}
+
+void HandlePossibleTextSelect(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	DWORD cbSelStart, cbSelEnd;
+	SendMessage(GetDlgItem(hWnd, IDC_TEXT_EDIT), EM_GETSEL, (WPARAM)&cbSelStart, (LPARAM)&cbSelEnd);
+
+	static BOOL areControlsEnabled = FALSE;
+
+	// Has selected some text
+	if (cbSelStart != cbSelEnd && !areControlsEnabled)
+	{
+		areControlsEnabled = TRUE;
+		EnableTextEditMenuItems(hWnd, TRUE);
+	}
+
+	else if (cbSelStart == cbSelEnd && areControlsEnabled)
+	{
+		areControlsEnabled = FALSE;
+		EnableTextEditMenuItems(hWnd, FALSE);
+	}
+}

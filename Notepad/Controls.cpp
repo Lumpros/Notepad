@@ -32,13 +32,13 @@ static void SetStatusWidths(HWND hWnd)
 
 	iStatusWidths[0] = part_width > 0 ? part_width : 0;
 
-	int with_sum_so_far = 0;
+	int previousWidthsSum = 0;
 
 	// Apply changes to each part based on the previous calculations
 	for (unsigned int i = 1; i < SIZEOF_ARR(dxStatusWidths); ++i)
 	{
-		with_sum_so_far += dxStatusWidths[i - 1];
-		iStatusWidths[i] = dxStatusWidths[i] + part_width + with_sum_so_far;
+		previousWidthsSum += dxStatusWidths[i - 1];
+		iStatusWidths[i] = dxStatusWidths[i] + part_width + previousWidthsSum;
 	}
 }
 
@@ -50,7 +50,7 @@ static UINT GetStatusBarHeight(HWND hWnd)
 	return sbRect.bottom - sbRect.top;
 }
 
-static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
+static LPCWSTR LoadRichControlDLL(void)
 {
 	LPCWSTR editclass;
 
@@ -61,9 +61,23 @@ static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
 
 	else
 	{
-		MessageBox(NULL, L"Failed to load Msftedit.dll! Zooming in/out will not available!", L"Warning", MB_OK | MB_ICONEXCLAMATION);
+		MessageBox(
+			NULL,
+			L"Failed to load Msftedit.dll! Zooming in/out will not be available!",
+			L"Warning",
+			MB_OK | MB_ICONEXCLAMATION
+		);
+
 		editclass = L"Edit";
 	}
+
+	return editclass;
+}
+
+
+static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
+{
+	LPCWSTR editclass = LoadRichControlDLL();
 
 	RECT clientRect;
 	GetClientRect(hWnd, &clientRect);
@@ -73,7 +87,8 @@ static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
 		editclass,
 		NULL,
 		WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT |
-		ES_MULTILINE | ES_AUTOVSCROLL | WS_HSCROLL,
+		ES_MULTILINE | ES_AUTOVSCROLL | WS_HSCROLL |
+		ES_AUTOHSCROLL | ES_DISABLENOSCROLL,
 		0, 0, 
 		clientRect.right, 
 		clientRect.bottom - GetStatusBarHeight(hWnd),
@@ -84,9 +99,7 @@ static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
 	);
 
 	if (lstrcmpW(editclass, MSFTEDIT_CLASS) == 0)
-	{
 		SendMessage(editControlHandle, EM_SETZOOM, 10, 9);
-	}
 
 	return editControlHandle;
 }

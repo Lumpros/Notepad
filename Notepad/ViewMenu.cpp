@@ -76,8 +76,6 @@ static void HandleStatusBarToggle(HWND hWnd)
 		EnableStatusBar(hWnd);
 		CheckMenuItem(hMenu, IDM_VIEW_STATUS, MF_CHECKED);
 	}
-
-	InvalidateRect(hWnd, NULL, FALSE);
 }
 
 static void RestoreZoomLevel(HWND hWnd)

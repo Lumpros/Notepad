@@ -7,12 +7,6 @@ void PaintWindowsLogo(HDC hDC, HBITMAP winBitmap)
 	BITMAP bitmap;
 	HDC hdcMem;
 	HGDIOBJ oldBitmap;
-	BLENDFUNCTION bf;
-
-	bf.BlendOp = AC_SRC_OVER;
-	bf.BlendFlags = 0;
-	bf.SourceConstantAlpha = 0xFF;
-	bf.AlphaFormat = AC_SRC_ALPHA;
 
 	hdcMem = CreateCompatibleDC(hDC);
 	oldBitmap = SelectObject(hdcMem, winBitmap);

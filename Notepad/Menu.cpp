@@ -83,6 +83,8 @@ static void InitializeEditSubmenu(HMENU hMenu)
 	AppendMenu(hEditSubmenu, MF_STRING, IDM_EDIT_TIME_DATE, L"Time/Date\tF5");
 
 	AppendMenu(hMenu, MF_POPUP | MF_STRING, (UINT)hEditSubmenu, L"&Edit");
+
+	EnableMenuItem(hMenu, IDM_EDIT_GOTO, MF_DISABLED | MF_GRAYED | MF_BYCOMMAND);
 }
 
 static void InitializeFormatSubmenu(HMENU hMenu)
@@ -134,4 +136,6 @@ void InitializeMenu(HWND hWnd)
 	InitializeHelpSubmenu(hMenu);
 
 	SetMenu(hWnd, hMenu);
+
+	EnableTextEditMenuItems(hWnd, FALSE);
 }

@@ -2,7 +2,7 @@
 #include "EditMenu.h"
 #include "Identifiers.h"
 
-static LPWSTR GetOpenfilenameStructFromDialog(HWND hWnd, BOOL* success)
+static LPWSTR GetFilenameFromDialog(HWND hWnd, BOOL* success)
 {
 	OPENFILENAME ofn = { 0 };
 	WCHAR* lpstrFile = new WCHAR[256];
@@ -36,8 +36,10 @@ static void SetEditControlTextToFileData(HANDLE hFile, HWND hWnd)
 	DWORD bytes_read;
 	BOOL read_result;
 
+	SetWindowText(GetDlgItem(hWnd, IDC_TEXT_EDIT), L"");
+
 	do {
-		read_result = ReadFile(hFile, buf, sizeof(buf), &bytes_read, NULL);
+		read_result = ReadFile(hFile, buf, sizeof(buf) / sizeof(WCHAR), &bytes_read, NULL);
 		AppendText(buf, hWnd);
 	} while (!read_result && bytes_read != 0);
 }
@@ -45,7 +47,7 @@ static void SetEditControlTextToFileData(HANDLE hFile, HWND hWnd)
 static void HandleOpenFile(HWND hWnd)
 {
 	BOOL success;
-	LPWSTR filename = GetOpenfilenameStructFromDialog(hWnd, &success);
+	LPWSTR filename = GetFilenameFromDialog(hWnd, &success);
 
 	if (success)
 	{

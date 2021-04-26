@@ -4,6 +4,7 @@
 #include "Menu.h"
 #include "Resource.h"
 #include "Identifiers.h"
+#include "EditMenu.h"
 
 #include <CommCtrl.h>
 
@@ -63,6 +64,10 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
 		CreateControls(hWnd);
 		InitializeMenu(hWnd);
+		return 0;
+
+	case WM_SETCURSOR:
+		HandlePossibleTextSelect(hWnd, wParam, lParam);
 		return 0;
 
 	case WM_CLOSE:
