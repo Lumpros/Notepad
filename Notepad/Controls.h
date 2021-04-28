@@ -10,3 +10,6 @@ void HandleWindowResize(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 void EnableStatusBar(HWND hWnd);
 void DisableStatusBar(HWND hWnd);
+
+BOOL HasChangedOriginalText(void);
+void DecrementChangeCount(HWND hWnd);

@@ -3,6 +3,15 @@
 #include "Controls.h"
 
 #include <time.h>
+#include <Richedit.h>
+#include <CommCtrl.h>
+
+void iSwap(int* a, int* b)
+{
+	int temp = *a;
+	*a = *b;
+	*b = temp;
+}
 
 void AppendText(LPCWSTR newText, HWND mainhWnd)
 {
@@ -40,12 +49,13 @@ static void InsertSystemTime(HWND hWnd)
 	InsertText(date, hWnd);
 }
 
-static void Undo(HWND hWnd)
+static void UndoChanges(HWND hWnd)
 {
+	DecrementChangeCount(hWnd);
 	SendMessage(GetDlgItem(hWnd, IDC_TEXT_EDIT), EM_UNDO, NULL, NULL);
 }
 
-static void Paste(HWND hWnd)
+static void PasteText(HWND hWnd)
 {
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
 		return;
@@ -69,6 +79,36 @@ static void Paste(HWND hWnd)
 	CloseClipboard();
 }
 
+static void DeleteSelectedText(HWND hWnd)
+{
+	SendMessage(GetDlgItem(hWnd, IDC_TEXT_EDIT), EM_REPLACESEL, TRUE, (LPARAM)L"");
+}
+
+static void	CopySelectedText(HWND hWndMain)
+{
+	INPUT inputs[4];
+	for (size_t i = 0; i < 4; ++i)
+	{
+		ZeroMemory(&inputs[i].ki, sizeof(KEYBDINPUT));
+		inputs[i].type = INPUT_KEYBOARD;
+	}
+
+	inputs[0].ki.wVk = VK_CONTROL;
+	inputs[1].ki.wVk = 0x43; // 'C' Virtual Key Code
+	inputs[2].ki.wVk = VK_CONTROL;
+	inputs[2].ki.dwFlags = KEYEVENTF_KEYUP;
+	inputs[3].ki.wVk = 0x43;
+	inputs[3].ki.dwFlags = KEYEVENTF_KEYUP;
+
+	SendInput(sizeof(inputs) / sizeof(inputs[0]), inputs, sizeof(INPUT));
+}
+
+static void CutSelectedText(HWND hWnd)
+{
+	CopySelectedText(hWnd);
+	DeleteSelectedText(hWnd);
+}
+
 void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam))
@@ -78,11 +118,23 @@ void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case IDM_EDIT_UNDO:
-		Undo(hWnd);
+		UndoChanges(hWnd);
 		break;
 
 	case IDM_EDIT_PASTE:
-		Paste(hWnd);
+		PasteText(hWnd);
+		break;
+
+	case IDM_EDIT_COPY:
+		CopySelectedText(hWnd);
+		break;
+
+	case IDM_EDIT_CUT:
+		CutSelectedText(hWnd);
+		break;
+
+	case IDM_EDIT_DELETE:
+		DeleteSelectedText(hWnd);
 		break;
 	}
 }
@@ -95,10 +147,8 @@ void EnableTextEditMenuItems(HWND hWnd, BOOL enabled)
 		return;
 
 	UINT uEnable = enabled ? MF_ENABLED : (MF_GRAYED | MF_DISABLED);
-
 	uEnable |= MF_BYCOMMAND;
 
-	EnableMenuItem(hMenu, IDM_EDIT_UNDO, uEnable);
 	EnableMenuItem(hMenu, IDM_EDIT_CUT, uEnable);
 	EnableMenuItem(hMenu, IDM_EDIT_COPY, uEnable);
 	EnableMenuItem(hMenu, IDM_EDIT_DELETE, uEnable);
@@ -111,7 +161,9 @@ void EnableTextEditMenuItems(HWND hWnd, BOOL enabled)
 void HandlePossibleTextSelect(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	DWORD cbSelStart, cbSelEnd;
-	SendMessage(GetDlgItem(hWnd, IDC_TEXT_EDIT), EM_GETSEL, (WPARAM)&cbSelStart, (LPARAM)&cbSelEnd);
+	HWND parent = GetParent(hWnd);
+
+	SendMessage(hWnd, EM_GETSEL, (WPARAM)&cbSelStart, (LPARAM)&cbSelEnd);
 
 	static BOOL areControlsEnabled = FALSE;
 
@@ -119,12 +171,44 @@ void HandlePossibleTextSelect(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	if (cbSelStart != cbSelEnd && !areControlsEnabled)
 	{
 		areControlsEnabled = TRUE;
-		EnableTextEditMenuItems(hWnd, TRUE);
+		EnableTextEditMenuItems(parent, TRUE);
 	}
 
 	else if (cbSelStart == cbSelEnd && areControlsEnabled)
 	{
 		areControlsEnabled = FALSE;
-		EnableTextEditMenuItems(hWnd, FALSE);
+		EnableTextEditMenuItems(parent, FALSE);
 	}
+}
+
+void SetLineColumnStatusBar(HWND hWnd)
+{
+	// because it is called from the wndproc of the edit control
+	HWND hControl = hWnd;
+	hWnd = GetParent(hWnd);
+
+	CHARRANGE cr;
+	SendMessage(hControl, EM_EXGETSEL, NULL, (LPARAM)&cr);
+
+	DWORD dwColumn = 0;// SendMessage(hControl, EM_LINELENGTH, cr.cpMin, NULL);
+
+	DWORD dwLineIndex = SendMessage(hControl, EM_EXLINEFROMCHAR, 0, cr.cpMax);
+
+	WCHAR buf[32];
+	wsprintf(buf, L" Ln %d, Col %d", dwLineIndex + 1, dwColumn + 1);
+
+	HWND hStatusBar = GetDlgItem(hWnd, IDC_STATUS_BAR);
+	SendMessage(hStatusBar, SB_SETTEXT, 1, (LPARAM)buf);
+
+	UpdateWindow(hStatusBar);
+}
+
+BOOL SelectionHasChanged(UINT message, LPARAM lParam)
+{
+	if (message == WM_SETCURSOR)
+	{
+		return HIWORD(lParam) != WM_MOUSEMOVE;
+	}
+
+	return TRUE;
 }

@@ -4,7 +4,6 @@
 #include "Menu.h"
 #include "Resource.h"
 #include "Identifiers.h"
-#include "EditMenu.h"
 
 #include <CommCtrl.h>
 
@@ -28,6 +27,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
 	wc.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 
+	HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
+
 	if (!RegisterClass(&wc))
 	{
 		MessageBox(NULL, L"Failed to register window class", L"Error", MB_OK | MB_ICONERROR);
@@ -49,8 +50,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	MSG msg = { 0 };
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if (!TranslateAccelerator(hWnd, hAccel, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 	}
 	
 	return msg.wParam;
@@ -64,10 +68,6 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
 		CreateControls(hWnd);
 		InitializeMenu(hWnd);
-		return 0;
-
-	case WM_SETCURSOR:
-		HandlePossibleTextSelect(hWnd, wParam, lParam);
 		return 0;
 
 	case WM_CLOSE:

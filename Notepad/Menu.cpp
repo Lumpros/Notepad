@@ -73,7 +73,7 @@ static void InitializeEditSubmenu(HMENU hMenu)
 	AppendMenu(hEditSubmenu, MF_STRING, IDM_EDIT_DELETE, L"Delete\tDel");
 	AppendMenu(hEditSubmenu, MF_SEPARATOR, NULL, NULL);
 	AppendMenu(hEditSubmenu, MF_STRING, IDM_EDIT_SEARCH, L"Search with Bing...\tCtrl+E");
-	AppendMenu(hEditSubmenu, MF_STRING, IDM_EDIT_FIND, L"Find\tCtrl+F");
+	AppendMenu(hEditSubmenu, MF_STRING, IDM_EDIT_FIND, L"Find...\tCtrl+F");
 	AppendMenu(hEditSubmenu, MF_STRING, IDM_EDIT_FIND_NEXT, L"Find Next\tF3");
 	AppendMenu(hEditSubmenu, MF_STRING, IDM_EDIT_FIND_PREV, L"Find Previous\tShift+F3");
 	AppendMenu(hEditSubmenu, MF_STRING, IDM_EDIT_REPLACE, L"Replace...\tCtrl+H");
@@ -138,4 +138,5 @@ void InitializeMenu(HWND hWnd)
 	SetMenu(hWnd, hMenu);
 
 	EnableTextEditMenuItems(hWnd, FALSE);
+	EnableMenuItem(GetMenu(hWnd), IDM_EDIT_UNDO, MF_BYCOMMAND | MF_GRAYED | MF_DISABLED);
 }

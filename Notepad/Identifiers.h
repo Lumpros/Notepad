@@ -49,7 +49,7 @@
 
 #define IDM_HELP			500
 #define IDM_HELP_VIEW		5001
-#define IDM_HELP_FEEDBACK	5002
+#define IDM_HELP_FEEDBACK	5002	
 #define IDM_HELP_ABOUT		5003
 
 #define IDC_TEXT_EDIT		1

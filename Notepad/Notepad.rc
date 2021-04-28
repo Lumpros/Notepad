@@ -106,6 +106,33 @@ BEGIN
     0
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATOR1 ACCELERATORS
+BEGIN
+    "N",            IDM_FILE_NEW,           VIRTKEY, CONTROL, NOINVERT
+    "N",            IDM_FILE_NEW_WINDOW,    VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "O",            IDM_FILE_OPEN,          VIRTKEY, CONTROL, NOINVERT
+    "S",            IDM_FILE_SAVE,          VIRTKEY, CONTROL, NOINVERT
+    "P",            IDM_FILE_PRINT,         VIRTKEY, CONTROL, NOINVERT
+    "S",            IDM_FILE_SAVE_AS,       VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "E",            IDM_EDIT_SEARCH,        VIRTKEY, CONTROL, NOINVERT
+    "F",            IDM_EDIT_FIND,          VIRTKEY, CONTROL, NOINVERT
+    VK_F3,          IDM_EDIT_FIND_NEXT,     VIRTKEY, NOINVERT
+    VK_F3,          IDM_EDIT_FIND_PREV,     VIRTKEY, SHIFT, NOINVERT
+    "H",            IDM_EDIT_REPLACE,       VIRTKEY, CONTROL, NOINVERT
+    "G",            IDM_EDIT_GOTO,          VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          IDM_EDIT_TIME_DATE,     VIRTKEY, NOINVERT, NOINVERT
+    VK_OEM_PLUS,    IDM_VIEW_ZOOM_IN,       VIRTKEY, CONTROL, NOINVERT
+    VK_OEM_MINUS,   IDM_VIEW_ZOOM_OUT,      VIRTKEY, CONTROL, NOINVERT
+    "Z",            IDM_EDIT_UNDO,          VIRTKEY, CONTROL, NOINVERT
+    "0",            IDM_VIEW_RESTORE,       VIRTKEY, CONTROL, NOINVERT
+END
+
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 

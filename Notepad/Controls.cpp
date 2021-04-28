@@ -1,15 +1,19 @@
 #include "Controls.h"
 #include "Identifiers.h"
+#include "EditMenu.h"
 
 #include <CommCtrl.h>
 #include <Richedit.h>
 
 #define SIZEOF_ARR(arr)	sizeof(arr) / sizeof(arr[0])
 
+WNDPROC oldEditProcedure;
+
+int change_count = 0;
+
 BOOL isStatusBarEnabled = TRUE;
 
 const int dxStatusWidths[] = { 0, 174, 64, 150, 150, -1 };
-
 int iStatusWidths[SIZEOF_ARR(dxStatusWidths)];
 
 // The first part is the only one that changes size as the window changes size
@@ -39,6 +43,33 @@ static void SetStatusWidths(HWND hWnd)
 	{
 		previousWidthsSum += dxStatusWidths[i - 1];
 		iStatusWidths[i] = dxStatusWidths[i] + part_width + previousWidthsSum;
+	}
+}
+
+BOOL HasChangedOriginalText(void)
+{
+	return change_count > 0;
+}
+
+static void HandleUndoButtonActivation(HWND hWnd, UINT message, WPARAM wParam)
+{
+	if (message == WM_CHAR)
+	{
+		++change_count;
+
+		if (change_count == 1)
+		{
+			HMENU hMenu = GetMenu(GetParent(hWnd));
+			EnableMenuItem(hMenu, IDM_EDIT_UNDO, MF_BYCOMMAND | MF_ENABLED);
+		}
+	}
+}
+
+void DecrementChangeCount(HWND hWnd)
+{
+	if (change_count > 0)
+	{
+		--change_count;
 	}
 }
 
@@ -74,6 +105,33 @@ static LPCWSTR LoadRichControlDLL(void)
 	return editclass;
 }
 
+LRESULT CALLBACK EditControlProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_CHAR:
+	case WM_KEYDOWN:
+	case WM_KEYUP:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_LBUTTONDBLCLK:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_RBUTTONDBLCLK:
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+	case WM_MBUTTONDBLCLK:
+	case EM_SETSEL:
+		HandleUndoButtonActivation(hWnd, message, wParam);
+		if (SelectionHasChanged(message, lParam))
+		{
+			HandlePossibleTextSelect(hWnd, wParam, lParam);
+			SetLineColumnStatusBar(hWnd);
+		}
+	}
+
+	return CallWindowProc(oldEditProcedure, hWnd, message, wParam, lParam);
+}
 
 static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
 {
@@ -98,6 +156,8 @@ static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
 		NULL
 	);
 
+	oldEditProcedure = (WNDPROC)SetWindowLongPtr(editControlHandle, GWLP_WNDPROC, (LONG_PTR)EditControlProcedure);
+
 	if (lstrcmpW(editclass, MSFTEDIT_CLASS) == 0)
 		SendMessage(editControlHandle, EM_SETZOOM, 10, 9);
 
@@ -119,7 +179,7 @@ static HWND CreateStatusBar(HWND hWnd, HINSTANCE hInstance)
 	SetStatusWidths(hWnd);
 
 	SendMessage(statusBarHandle, SB_SETPARTS, SIZEOF_ARR(iStatusWidths), (LPARAM)iStatusWidths);
-	SendMessage(statusBarHandle, SB_SETTEXT, 1, (LPARAM)L" Ln 1 Col 1");
+	SendMessage(statusBarHandle, SB_SETTEXT, 1, (LPARAM)L" Ln 1, Col 1");
 	SendMessage(statusBarHandle, SB_SETTEXT, 2, (LPARAM)L" 100%");
 	SendMessage(statusBarHandle, SB_SETTEXT, 3, (LPARAM)L" Windows (CRLF)");
 	SendMessage(statusBarHandle, SB_SETTEXT, 4, (LPARAM)L" UTF-8");
