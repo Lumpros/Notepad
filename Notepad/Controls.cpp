@@ -14,7 +14,20 @@ int change_count = 0;
 BOOL isStatusBarEnabled = TRUE;
 
 const int dxStatusWidths[] = { 0, 174, 64, 150, 150, -1 };
+
 int iStatusWidths[SIZEOF_ARR(dxStatusWidths)];
+
+HFONT hCurrentFont = NULL;
+
+void SaveHFont(HFONT hFont)
+{
+	hCurrentFont = hFont;
+}
+
+HFONT RetrieveHFont(void)
+{
+	return hCurrentFont;
+}
 
 // The first part is the only one that changes size as the window changes size
 // If the window is so small that the first part's with is 0, then the rest of
@@ -73,7 +86,7 @@ void DecrementChangeCount(HWND hWnd)
 	}
 }
 
-static UINT GetStatusBarHeight(HWND hWnd)
+UINT GetStatusBarHeight(HWND hWnd)
 {
 	RECT sbRect;
 	GetWindowRect(GetDlgItem(hWnd, IDC_STATUS_BAR), &sbRect);
@@ -207,6 +220,7 @@ void CreateControls(HWND hWnd)
 
 	TEXTMETRIC tm = GetSystemFontMetrics(hWnd);
 	HFONT hFont = CreateFont(tm.tmHeight + tm.tmExternalLeading, tm.tmAveCharWidth, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, DEFAULT_FONT_STR);
+	SaveHFont(hFont);
 	
 	HWND status_bar_handle = CreateStatusBar(hWnd, hInstance);
 

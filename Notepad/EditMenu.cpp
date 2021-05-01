@@ -109,6 +109,11 @@ static void CutSelectedText(HWND hWnd)
 	DeleteSelectedText(hWnd);
 }
 
+UINT_PTR CALLBACK FRWindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	return TRUE;
+}
+
 // Don't forget to call free()
 static FINDREPLACE GetFindStruct(HWND hWnd)
 {
@@ -121,15 +126,17 @@ static FINDREPLACE GetFindStruct(HWND hWnd)
 	fr.hwndOwner		= hWnd;
 	fr.lpstrFindWhat	= lpstrFindWhat;
 	fr.wFindWhatLen		= size * sizeof(WCHAR);
+	fr.lpfnHook			= FRWindowProcedure;
+	fr.Flags			= FR_ENABLEHOOK;
 
 	return fr;
 }
 
 static void HandleFind(HWND hWnd)
 {
-	RegisterWindowMessage(FINDMSGSTRING);
 	FINDREPLACE fr = GetFindStruct(hWnd);
-	HWND hDlgWnd = FindText(&fr);
+
+	FindText(&fr);
 
 	free(fr.lpstrFindWhat);
 }

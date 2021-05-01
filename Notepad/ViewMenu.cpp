@@ -84,6 +84,11 @@ static void RestoreZoomLevel(HWND hWnd)
 	RequestZoom(hWnd);
 }
 
+void RefreshZoom(HWND hWnd)
+{
+	RequestZoom(hWnd);
+}
+
 void HandleViewMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam))
