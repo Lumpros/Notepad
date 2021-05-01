@@ -5,3 +5,5 @@
 void HandleViewMenu(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 void RefreshZoom(HWND hWnd);
+
+void UpdateZoom(HWND hWnd, SHORT bWheelDelta);

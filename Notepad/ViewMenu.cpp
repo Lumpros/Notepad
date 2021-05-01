@@ -19,6 +19,53 @@ static void SetStatusBarZoomText(HWND hWnd)
 	SendMessage(hStatusBar, SB_SETTEXT, 2, (LPARAM)buf);
 }
 
+static void RestrictNumeratorRange(void)
+{
+	if (zoom_numerator > 500)
+	{
+		zoom_numerator = 500;
+	}
+
+	else if (zoom_numerator < 10)
+	{
+		zoom_numerator = 10;
+	}
+}
+
+static INT RoundValueToTen(INT value, SHORT bWheelDelta)
+{
+	INT iLastDigit = value % 10;
+
+	value -= iLastDigit;
+
+	if (bWheelDelta > 0)
+	{
+		value += 10;
+	}
+
+	return value;
+}
+
+void UpdateZoom(HWND hWnd, SHORT bWheelDelta)
+{
+	HWND hEditControl = GetDlgItem(hWnd, IDC_TEXT_EDIT);
+	DWORD dwNominator, dwDenominator;
+
+	SendMessage(hEditControl, EM_GETZOOM, (WPARAM)&dwNominator, (LPARAM)&dwDenominator);
+	
+	// Don't even know if this is possible but I'm not risking it
+	if (dwDenominator != 0)
+	{
+		zoom_numerator = (dwNominator * ZOOM_DENOMINATOR) / dwDenominator;
+	}
+
+	zoom_numerator = RoundValueToTen(zoom_numerator, bWheelDelta);
+	RestrictNumeratorRange();
+
+	SendMessage(hEditControl, EM_SETZOOM, (WPARAM)zoom_numerator, (LPARAM)ZOOM_DENOMINATOR);
+	SetStatusBarZoomText(hWnd);
+}
+
 static void RequestZoom(HWND hWnd)
 {
 	HWND hControl = GetDlgItem(hWnd, IDC_TEXT_EDIT);

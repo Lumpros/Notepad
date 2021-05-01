@@ -1,6 +1,7 @@
 #include "Controls.h"
 #include "Identifiers.h"
 #include "EditMenu.h"
+#include "ViewMenu.h"
 
 #include <CommCtrl.h>
 #include <Richedit.h>
@@ -118,6 +119,16 @@ static LPCWSTR LoadRichControlDLL(void)
 	return editclass;
 }
 
+static void HandlePossibleMouseZoom(HWND hWnd, WPARAM wParam)
+{
+	if ((LOWORD(wParam) & MK_CONTROL) == MK_CONTROL)
+	{
+		SHORT scroll = GET_WHEEL_DELTA_WPARAM(wParam);
+		
+		UpdateZoom(GetParent(hWnd), scroll);
+	}
+}
+
 LRESULT CALLBACK EditControlProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -141,9 +152,21 @@ LRESULT CALLBACK EditControlProcedure(HWND hWnd, UINT message, WPARAM wParam, LP
 			HandlePossibleTextSelect(hWnd, wParam, lParam);
 			SetLineColumnStatusBar(hWnd);
 		}
+		break;
+
+	case WM_MOUSEWHEEL:
+		
+		CallWindowProc(oldEditProcedure, hWnd, message, wParam, lParam);
+		HandlePossibleMouseZoom(hWnd, wParam);
+		return 0;
 	}
 
 	return CallWindowProc(oldEditProcedure, hWnd, message, wParam, lParam);
+}
+
+void SetEditControlWindProc(HWND hEditControl)
+{
+	oldEditProcedure = (WNDPROC)SetWindowLongPtr(hEditControl, GWLP_WNDPROC, (LONG_PTR)EditControlProcedure);
 }
 
 static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
@@ -169,7 +192,7 @@ static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
 		NULL
 	);
 
-	oldEditProcedure = (WNDPROC)SetWindowLongPtr(editControlHandle, GWLP_WNDPROC, (LONG_PTR)EditControlProcedure);
+	SetEditControlWindProc(editControlHandle);
 
 	if (lstrcmpW(editclass, MSFTEDIT_CLASS) == 0)
 		SendMessage(editControlHandle, EM_SETZOOM, 10, 9);

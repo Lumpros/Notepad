@@ -3,6 +3,7 @@
 #include "Identifiers.h"
 #include "Controls.h"
 #include "ViewMenu.h"
+#include "Resource.h"
 
 #include <CommCtrl.h>
 #include <Richedit.h>
@@ -125,6 +126,7 @@ static void HandleWordWrap(HWND hWnd)
 	SetWindowText(hEdit, lpszCopy);
 	free(lpszCopy);
 	RefreshZoom(hWnd);
+	SetEditControlWindProc(hEdit);
 
 	CheckMenuItem(hMenu, IDM_FORMAT_WORDWRAP, DecideCheckBasedOnState(checkState));
 }

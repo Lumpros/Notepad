@@ -23,3 +23,5 @@ UINT GetStatusBarHeight(HWND hWnd);
 void SaveHFont(HFONT hFont);
 
 HFONT RetrieveHFont(void);
+
+void SetEditControlWindProc(HWND hEditControl);
