@@ -6,7 +6,7 @@
 #include <Richedit.h>
 #include <CommCtrl.h>
 
-void iSwap(int* a, int* b)
+static void iSwap(int* a, int* b)
 {
 	int temp = *a;
 	*a = *b;
@@ -109,6 +109,31 @@ static void CutSelectedText(HWND hWnd)
 	DeleteSelectedText(hWnd);
 }
 
+// Don't forget to call free()
+static FINDREPLACE GetFindStruct(HWND hWnd)
+{
+	const BYTE size = 64;
+	LPWSTR lpstrFindWhat    = (LPWSTR)calloc(size, sizeof(WCHAR));
+
+	FINDREPLACE fr;
+	ZeroMemory(&fr, sizeof(fr));
+	fr.lStructSize		= sizeof(fr);
+	fr.hwndOwner		= hWnd;
+	fr.lpstrFindWhat	= lpstrFindWhat;
+	fr.wFindWhatLen		= size * sizeof(WCHAR);
+
+	return fr;
+}
+
+static void HandleFind(HWND hWnd)
+{
+	RegisterWindowMessage(FINDMSGSTRING);
+	FINDREPLACE fr = GetFindStruct(hWnd);
+	HWND hDlgWnd = FindText(&fr);
+
+	free(fr.lpstrFindWhat);
+}
+
 void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam))
@@ -136,6 +161,10 @@ void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	case IDM_EDIT_DELETE:
 		DeleteSelectedText(hWnd);
 		break;
+
+	case IDM_EDIT_FIND:
+		HandleFind(hWnd);
+		break;
 	}
 }
 
@@ -153,9 +182,6 @@ void EnableTextEditMenuItems(HWND hWnd, BOOL enabled)
 	EnableMenuItem(hMenu, IDM_EDIT_COPY, uEnable);
 	EnableMenuItem(hMenu, IDM_EDIT_DELETE, uEnable);
 	EnableMenuItem(hMenu, IDM_EDIT_SEARCH, uEnable);
-	EnableMenuItem(hMenu, IDM_EDIT_FIND, uEnable);
-	EnableMenuItem(hMenu, IDM_EDIT_FIND_NEXT, uEnable);
-	EnableMenuItem(hMenu, IDM_EDIT_FIND_PREV, uEnable);
 }
 
 void HandlePossibleTextSelect(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -192,7 +218,7 @@ void SetLineColumnStatusBar(HWND hWnd)
 
 	DWORD dwColumn = 0;// SendMessage(hControl, EM_LINELENGTH, cr.cpMin, NULL);
 
-	DWORD dwLineIndex = SendMessage(hControl, EM_EXLINEFROMCHAR, 0, cr.cpMax);
+	LRESULT dwLineIndex = SendMessage(hControl, EM_EXLINEFROMCHAR, 0, cr.cpMax);
 
 	WCHAR buf[32];
 	wsprintf(buf, L" Ln %d, Col %d", dwLineIndex + 1, dwColumn + 1);

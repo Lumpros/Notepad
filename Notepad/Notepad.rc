@@ -47,16 +47,6 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_ICON1               ICON                    "C:\\Users\\lampr\\Downloads\\Notepad.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Dialog
 //
 
@@ -66,7 +56,7 @@ CAPTION "About Notepad"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,253,174,50,14
-    LTEXT           "Microsoft Windows\nVersion 2020 (OS Build whatever)\n© Microsoft Corporation. All rights reserved.\n\nThe Windows 10 Home operating system and its user interface are\nprotected by trademark and other pending or existing intellectual\nproperty rights in the United States and other countries/regions.",IDC_STATIC,48,47,220,62
+    LTEXT           "Microsoft Windows\nVersion 2020 (OS Build whatever)\n© Microsoft Corporation. All rights reserved.\n\nThe Windows 10 Home operating system and its user interface are\nprotected by trademark and other pending or existing intellectual\nproperty rights in the Unit",IDC_STATIC,48,47,220,62
     LTEXT           "This product is licensed under the Microsoft Software License Terms to:\n\n    billgates@outlook.com",IDC_STATIC,47,125,215,38
 END
 
@@ -126,12 +116,22 @@ BEGIN
     VK_F3,          IDM_EDIT_FIND_PREV,     VIRTKEY, SHIFT, NOINVERT
     "H",            IDM_EDIT_REPLACE,       VIRTKEY, CONTROL, NOINVERT
     "G",            IDM_EDIT_GOTO,          VIRTKEY, CONTROL, NOINVERT
-    VK_F5,          IDM_EDIT_TIME_DATE,     VIRTKEY, NOINVERT, NOINVERT
+    VK_F5,          IDM_EDIT_TIME_DATE,     VIRTKEY, NOINVERT
     VK_OEM_PLUS,    IDM_VIEW_ZOOM_IN,       VIRTKEY, CONTROL, NOINVERT
     VK_OEM_MINUS,   IDM_VIEW_ZOOM_OUT,      VIRTKEY, CONTROL, NOINVERT
     "Z",            IDM_EDIT_UNDO,          VIRTKEY, CONTROL, NOINVERT
     "0",            IDM_VIEW_RESTORE,       VIRTKEY, CONTROL, NOINVERT
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "Resources\\Notepad.ico"
 
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////

@@ -22,7 +22,7 @@ static void SetStatusBarZoomText(HWND hWnd)
 static void RequestZoom(HWND hWnd)
 {
 	HWND hControl = GetDlgItem(hWnd, IDC_TEXT_EDIT);
-	BOOL bAccepted = SendMessage(hControl, EM_SETZOOM, (WPARAM)zoom_numerator, (LPARAM)ZOOM_DENOMINATOR);
+	LRESULT bAccepted = SendMessage(hControl, EM_SETZOOM, (WPARAM)zoom_numerator, (LPARAM)ZOOM_DENOMINATOR);
 
 	if (!bAccepted)
 		MessageBox(NULL, L"Request to change zoom level was denied!", L"Error", MB_OK | MB_ICONERROR);

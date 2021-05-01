@@ -13,3 +13,4 @@ void DisableStatusBar(HWND hWnd);
 
 BOOL HasChangedOriginalText(void);
 void DecrementChangeCount(HWND hWnd);
+TEXTMETRIC GetSystemFontMetrics(HWND hWnd);

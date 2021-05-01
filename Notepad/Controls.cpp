@@ -187,10 +187,26 @@ static HWND CreateStatusBar(HWND hWnd, HINSTANCE hInstance)
 	return statusBarHandle;
 }
 
+TEXTMETRIC GetSystemFontMetrics(HWND hWnd)
+{
+	HDC hDC = GetDC(hWnd);
+
+	SelectObject(hDC, GetStockObject(SYSTEM_FONT));
+
+	TEXTMETRIC tm;
+	GetTextMetrics(hDC, &tm);
+
+	ReleaseDC(hWnd, hDC);
+
+	return tm;
+}
+
 void CreateControls(HWND hWnd)
 {
 	HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
-	HFONT hFont = CreateFontW(21, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, DEFAULT_FONT_STR);
+
+	TEXTMETRIC tm = GetSystemFontMetrics(hWnd);
+	HFONT hFont = CreateFont(tm.tmHeight + tm.tmExternalLeading, tm.tmAveCharWidth, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, DEFAULT_FONT_STR);
 	
 	HWND status_bar_handle = CreateStatusBar(hWnd, hInstance);
 

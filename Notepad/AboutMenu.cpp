@@ -2,7 +2,7 @@
 #include "Identifiers.h"
 #include "Resource.h"
 
-void PaintWindowsLogo(HDC hDC, HBITMAP winBitmap)
+static void PaintWindowsLogo(HDC hDC, HBITMAP winBitmap)
 {
 	BITMAP bitmap;
 	HDC hdcMem;
@@ -13,7 +13,6 @@ void PaintWindowsLogo(HDC hDC, HBITMAP winBitmap)
 
 	GetObject(winBitmap, sizeof(bitmap), &bitmap);
 
-	// if the map mode isnt MM_TEXT im screwed lol
 	TransparentBlt(
 		hDC,
 		90,

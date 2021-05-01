@@ -8,7 +8,7 @@
 #include "ViewMenu.h"
 #include "AboutMenu.h"
 
-inline static BOOL IsInRange(WORD val, WORD left_incl, WORD right_incl)
+inline static BOOL IsInRange(WPARAM val, const WORD left_incl, const WORD right_incl)
 {
 	return (val >= left_incl && val <= right_incl);
 }

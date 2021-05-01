@@ -1,6 +1,7 @@
 #include "FormatMenu.h"
 #include "Controls.h"
 #include "Identifiers.h"
+#include "Controls.h"
 
 CHOOSEFONT GetChooseFontFromDialog(HWND hWnd)
 {
@@ -29,8 +30,10 @@ CHOOSEFONT GetChooseFontFromDialog(HWND hWnd)
 	{
 		initialized = true;
 
+		TEXTMETRIC tm = GetSystemFontMetrics(hWnd);
+
 		cf.lpLogFont = &lf;
-		cf.lpLogFont->lfHeight = 19;
+		cf.lpLogFont->lfHeight = tm.tmHeight + tm.tmExternalLeading;
 		lstrcpyW(cf.lpLogFont->lfFaceName, DEFAULT_FONT_STR);
 
 		ChooseFont(&cf);
