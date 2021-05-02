@@ -2,8 +2,6 @@
 
 #include <Windows.h>
 
-void InitializeMenu(HWND hWnd);
-
 void HandleMenuCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 CHOOSEFONT GetChooseFontFromDialog(HWND hWnd);

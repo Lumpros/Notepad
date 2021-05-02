@@ -164,7 +164,6 @@
     <ResourceCompile Include="Notepad.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\1100.bmp" />
     <Image Include="Resources\Notepad.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

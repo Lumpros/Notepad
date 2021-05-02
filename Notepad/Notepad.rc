@@ -13,6 +13,80 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "New\tCtrl+N",                 IDM_FILE_NEW
+        MENUITEM "New Window\tCtrl+Shift+N",    IDM_FILE_NEW_WINDOW
+        MENUITEM "Open...\tCtrl+O",             IDM_FILE_OPEN
+        MENUITEM "Save\tCtrl+S",                IDM_FILE_SAVE
+        MENUITEM "Save as...\tCtrl+Shift+S",    IDM_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "Page Setup",                  IDM_FILE_PAGE_SETUP
+        MENUITEM "Print...\tCtrl+P",            IDM_FILE_PRINT
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDM_FILE_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "Undo\tCtrl+Z",                IDM_EDIT_UNDO, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Cut\tCtrl+X",                 IDM_EDIT_CUT, GRAYED
+        MENUITEM "Copy\tCtrl+C",                IDM_EDIT_COPY, GRAYED
+        MENUITEM "Paste\tCtrl+V",               IDM_EDIT_PASTE
+        MENUITEM "Delete\tDel",                 IDM_EDIT_DELETE, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Search with Bing...\tCtrl+E", IDM_EDIT_SEARCH, GRAYED
+        MENUITEM "Find...\tCtrl+F",             IDM_EDIT_FIND
+        MENUITEM "Find Next\tF3",               IDM_EDIT_FIND_NEXT
+        MENUITEM "Find Previous\tShift+F3",     IDM_EDIT_FIND_PREV
+        MENUITEM "Replace...\tCtrl+H",          IDM_EDIT_REPLACE
+        MENUITEM "Go To...\tCtrl+G",            IDM_EDIT_GOTO, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Select All\tCtrl+A",          IDM_EDIT_SELECTALL
+        MENUITEM "Time/Date\tF5",               IDM_EDIT_TIME_DATE
+    END
+    POPUP "F&ormat"
+    BEGIN
+        MENUITEM "Word Wrap",                   IDM_FORMAT_WORDWRAP
+        MENUITEM "Font...",                     IDM_FORMAT_FONT
+    END
+    POPUP "&View"
+    BEGIN
+        POPUP "Zoom"
+        BEGIN
+            MENUITEM "Zoom In\tCtrl+Plus",          IDM_VIEW_ZOOM_IN
+            MENUITEM "Zoom Out\tCtrl+Minus",        IDM_VIEW_ZOOM_OUT
+            MENUITEM "Restore Default Zoom\tCtrl+0", IDM_VIEW_RESTORE
+        END
+        MENUITEM "Status Bar",                  IDM_VIEW_STATUS, CHECKED
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "View Help",                   IDM_HELP_VIEW
+        MENUITEM "Send Feedback",               IDM_HELP_FEEDBACK
+        MENUITEM SEPARATOR
+        MENUITEM "About Notepad",               IDM_HELP_ABOUT
+    END
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // English (United Kingdom) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
@@ -50,14 +124,14 @@ END
 // Dialog
 //
 
-IDD_ABOUT_DIALOG DIALOGEX 0, 0, 311, 191
+IDD_ABOUT_DIALOG DIALOGEX 0, 0, 267, 110
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION
 CAPTION "About Notepad"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,253,174,50,14
-    LTEXT           "Microsoft Windows\nVersion 2020 (OS Build whatever)\n© Microsoft Corporation. All rights reserved.\n\nThe Windows 10 Home operating system and its user interface are\nprotected by trademark and other pending or existing intellectual\nproperty rights in the Unit",IDC_STATIC,48,47,220,62
-    LTEXT           "This product is licensed under the Microsoft Software License Terms to:\n\n    billgates@outlook.com",IDC_STATIC,47,125,215,38
+    DEFPUSHBUTTON   "OK",IDOK,209,93,50,14
+    GROUPBOX        "Info",IDC_STATIC,7,7,251,83
+    LTEXT           "I have absolutely no idea how to add the standard Windows about dialog. This is a Notepad clone but probably not 100% accurate because I'm too lazy to do everything properly.\n\n\nProgrammed by Lampros Staikos\nSpring of 2021",IDC_STATIC,15,22,237,60
 END
 
 
@@ -71,19 +145,11 @@ GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUT_DIALOG, DIALOG
     BEGIN
-        RIGHTMARGIN, 310
-        BOTTOMMARGIN, 188
+        RIGHTMARGIN, 266
+        BOTTOMMARGIN, 107
     END
 END
 #endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_BITMAP1             BITMAP                  "Resources\\1100.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////

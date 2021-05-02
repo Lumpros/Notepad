@@ -5,8 +5,8 @@
 #define IDM_FILE                        100
 #define IDI_ICON1                       101
 #define IDD_ABOUT_DIALOG                102
-#define IDB_BITMAP1                     104
 #define IDR_ACCELERATOR1                106
+#define IDR_MENU1                       109
 #define IDM_EDIT                        200
 #define IDM_FORMAT                      300
 #define IDM_VIEW                        400
@@ -47,8 +47,8 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        109
-#define _APS_NEXT_COMMAND_VALUE         40018
+#define _APS_NEXT_RESOURCE_VALUE        111
+#define _APS_NEXT_COMMAND_VALUE         40029
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

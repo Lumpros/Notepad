@@ -43,6 +43,11 @@ static INT RoundValueToTen(INT value, SHORT bWheelDelta)
 		value += 10;
 	}
 
+	else if (bWheelDelta < 0 && value >= 450)
+	{
+		value -= 10;
+	}
+
 	return value;
 }
 
@@ -72,9 +77,14 @@ static void RequestZoom(HWND hWnd)
 	LRESULT bAccepted = SendMessage(hControl, EM_SETZOOM, (WPARAM)zoom_numerator, (LPARAM)ZOOM_DENOMINATOR);
 
 	if (!bAccepted)
+	{
 		MessageBox(NULL, L"Request to change zoom level was denied!", L"Error", MB_OK | MB_ICONERROR);
+	}
+
 	else
+	{
 		SetStatusBarZoomText(hWnd);
+	}
 }
 
 static void ZoomIn(HWND hWnd)

@@ -26,6 +26,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	wc.hbrBackground	= (HBRUSH)GetStockObject(WHITE_BRUSH);
 	wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
 	wc.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	wc.lpszMenuName     = MAKEINTRESOURCE(IDR_MENU1);
 
 	HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 
@@ -37,7 +38,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 
 	HWND hWnd = CreateWindow(
 		class_name,
-		L"Notepad",
+		L"Untitled - Notepad",
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		640, 480,
@@ -65,9 +66,8 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	switch (message)
 	{
 	case WM_CREATE:
-		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+		SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 		CreateControls(hWnd);
-		InitializeMenu(hWnd);
 		return 0;
 
 	case WM_CLOSE:

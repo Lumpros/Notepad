@@ -75,9 +75,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\1100.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="Resources\Notepad.ico">
       <Filter>Resource Files</Filter>
     </Image>

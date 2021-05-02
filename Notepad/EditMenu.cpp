@@ -13,7 +13,7 @@ static void iSwap(int* a, int* b)
 	*b = temp;
 }
 
-void AppendText(LPCWSTR newText, HWND mainhWnd)
+void AppendText(LPWSTR newText, HWND mainhWnd)
 {
 	HWND hwndOutput = GetDlgItem(mainhWnd, IDC_TEXT_EDIT);
 	DWORD startPos, endPos;
@@ -62,7 +62,7 @@ static void PasteText(HWND hWnd)
 
 	if (!OpenClipboard(hWnd))
 		return;
-
+	
 	HGLOBAL hClipboard = GetClipboardData(CF_UNICODETEXT);
 
 	if (hClipboard != NULL)
@@ -141,6 +141,17 @@ static void HandleFind(HWND hWnd)
 	free(fr.lpstrFindWhat);
 }
 
+static void HandleSelectAll(HWND hWnd)
+{
+	HWND hEditControl = GetDlgItem(hWnd, IDC_TEXT_EDIT);
+	INT  iTextLength  = GetWindowTextLength(hEditControl);
+
+	if (iTextLength > 0)
+	{
+		SendMessage(hEditControl, EM_SETSEL, (WPARAM)0, (LPARAM)iTextLength);
+	}
+}
+
 void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam))
@@ -171,6 +182,10 @@ void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	case IDM_EDIT_FIND:
 		HandleFind(hWnd);
+		break;
+
+	case IDM_EDIT_SELECTALL:
+		HandleSelectAll(hWnd);
 		break;
 	}
 }
