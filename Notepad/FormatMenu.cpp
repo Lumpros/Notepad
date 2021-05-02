@@ -78,7 +78,7 @@ static DWORD GetExtraCreationFlags(DWORD checkState)
 
 	if (checkState == MF_CHECKED)
 	{
-		dwFlags = ES_AUTOHSCROLL | WS_HSCROLL;
+		dwFlags = WS_HSCROLL;
 	}
 
 	return dwFlags;
@@ -97,7 +97,7 @@ static HWND CreateNewControlEdit(HWND hWnd, DWORD checkState)
 		MSFTEDIT_CLASS,
 		NULL,
 		WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT |
-		ES_MULTILINE | ES_AUTOVSCROLL | 
+		ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL |
 		ES_DISABLENOSCROLL | dwExtraFlags,
 		0, 0,
 		clientRect.right,

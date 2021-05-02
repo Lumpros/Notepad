@@ -26,7 +26,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	wc.hbrBackground	= (HBRUSH)GetStockObject(WHITE_BRUSH);
 	wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
 	wc.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-	wc.lpszMenuName     = MAKEINTRESOURCE(IDR_MENU1);
 
 	HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 
@@ -44,6 +43,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 		640, 480,
 		NULL, NULL, hInstance, NULL
 	);
+
+	HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
+	SetMenu(hWnd, hMenu);
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
