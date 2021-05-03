@@ -13,23 +13,6 @@ static void iSwap(int* a, int* b)
 	*b = temp;
 }
 
-void FixCaretPosition(HWND hWnd)
-{
-	CHARRANGE cr;
-	SendMessage(hWnd, EM_EXGETSEL, NULL, (LPARAM)&cr);
-
-	if (cr.cpMin != cr.cpMax)
-	{
-		INT iTextLength = GetWindowTextLength(hWnd);
-
-		if (cr.cpMax == iTextLength)
-		{
-			--cr.cpMax;
-			SendMessage(hWnd, EM_EXSETSEL, NULL, (LPARAM)&cr);
-		}
-	}
-}
-
 void AppendText(LPWSTR newText, HWND mainhWnd)
 {
 	HWND hwndOutput = GetDlgItem(mainhWnd, IDC_TEXT_EDIT);
@@ -165,8 +148,12 @@ static void HandleSelectAll(HWND hWnd)
 
 	if (iTextLength > 0)
 	{
+		CHARRANGE cr;
+		cr.cpMin = 0;
+		cr.cpMax = iTextLength;
+
 		SetFocus(hEditControl);
-		SendMessage(hEditControl, EM_SETSEL, (WPARAM)0, (LPARAM)iTextLength);
+		SendMessage(hEditControl, EM_EXSETSEL, NULL, (LPARAM)&cr);
 	}
 }
 
@@ -224,14 +211,34 @@ void EnableTextEditMenuItems(HWND hWnd, BOOL enabled)
 	EnableMenuItem(hMenu, IDM_EDIT_SEARCH, uEnable);
 }
 
-void HandlePossibleTextSelect(HWND hWnd, WPARAM wParam, LPARAM lParam)
+static CHARRANGE GetCurrentCharrange(HWND hEditControl, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	HWND parent = GetParent(hWnd);
-
 	CHARRANGE cr;
-	SendMessage(hWnd, EM_EXGETSEL, NULL, (LPARAM)&cr);
 
+	switch (message)
+	{
+	case EM_EXSETSEL:
+		cr = *(CHARRANGE*)lParam;
+		break;
+
+	case EM_SETSEL:
+		cr.cpMin = wParam;
+		cr.cpMax = lParam;
+		break;
+
+	default:
+		SendMessage(hEditControl, EM_EXGETSEL, NULL, (LPARAM)&cr);
+		break;
+	}
+
+	return cr;
+}
+
+void HandlePossibleTextSelect(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
 	static BOOL areControlsEnabled = FALSE;
+	HWND parent = GetParent(hWnd);
+	CHARRANGE cr = GetCurrentCharrange(hWnd, message, wParam, lParam);
 
 	// Has selected some text
 	if (cr.cpMin != cr.cpMax)

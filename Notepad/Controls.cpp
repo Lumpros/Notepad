@@ -143,11 +143,12 @@ LRESULT CALLBACK EditControlProcedure(HWND hWnd, UINT message, WPARAM wParam, LP
 	case WM_MBUTTONUP:
 	case WM_MBUTTONDBLCLK:
 	case EM_SETSEL:
+	case EM_EXSETSEL:
 		HandleUndoButtonActivation(hWnd, message, wParam);
-		FixCaretPosition(hWnd);
+
 		if (SelectionHasChanged(message, lParam))
 		{
-			HandlePossibleTextSelect(hWnd, wParam, lParam);
+			HandlePossibleTextSelect(hWnd, message, wParam, lParam);
 			SetLineColumnStatusBar(hWnd);
 		}
 		break;
