@@ -51,15 +51,12 @@ static void SetEditControlTextToFileData(HANDLE hFile, HWND hWnd)
 
 	SetWindowText(GetDlgItem(hWnd, IDC_TEXT_EDIT), L"");
 
-	ReadFile(hFile, buf, 3, &bytes_read, NULL);
-
 	do {
 		read_result = ReadFile(hFile, buf, cchWide * 2, &bytes_read, NULL);
 
 		MultiByteToWideChar(CP_UTF8, 0, buf, bytes_read, wBuf, bytes_read / sizeof(WCHAR));
 
 		AppendText(wBuf, hWnd);
-
 	} while (read_result && bytes_read != 0);
 
 	free(buf);

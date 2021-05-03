@@ -17,8 +17,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	InitCommonControls();
 	
 	LPCWSTR class_name = L"MainWindow";
-	WNDCLASS wc = { 0 };
+	WNDCLASS wc;
 	
+	ZeroMemory(&wc, sizeof(wc));
 	wc.hInstance		= hInstance;
 	wc.lpfnWndProc		= WindowProcedure;
 	wc.lpszClassName	= class_name;
@@ -44,6 +45,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 		NULL, NULL, hInstance, NULL
 	);
 
+	// Because my laptop doesn't like me
 	HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
 	SetMenu(hWnd, hMenu);
 

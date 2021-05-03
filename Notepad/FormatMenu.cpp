@@ -8,7 +8,7 @@
 #include <CommCtrl.h>
 #include <Richedit.h>
 
-CHOOSEFONT GetChooseFontFromDialog(HWND hWnd)
+CHOOSEFONT GetChooseFontFromDialog(HWND hWnd, BOOL* success)
 {
 	CHOOSEFONT cf;
 	LOGFONT lf;
@@ -41,7 +41,7 @@ CHOOSEFONT GetChooseFontFromDialog(HWND hWnd)
 		cf.lpLogFont->lfHeight = tm.tmHeight + tm.tmExternalLeading;
 		lstrcpyW(cf.lpLogFont->lfFaceName, DEFAULT_FONT_STR);
 
-		ChooseFont(&cf);
+		*success = ChooseFont(&cf);
 
 		oldlf = *cf.lpLogFont;
 	}
@@ -51,11 +51,16 @@ CHOOSEFONT GetChooseFontFromDialog(HWND hWnd)
 
 static void SetTextEditFont(HWND hWnd)
 {
-	CHOOSEFONT cf = GetChooseFontFromDialog(hWnd);
-	HFONT hFont = CreateFontIndirect(cf.lpLogFont);
-	SaveHFont(hFont);
-	SendMessage(GetDlgItem(hWnd, IDC_TEXT_EDIT), WM_SETFONT, (WPARAM)hFont, NULL);
-	InvalidateRect(hWnd, NULL, FALSE);
+	BOOL bSucces;
+	CHOOSEFONT cf = GetChooseFontFromDialog(hWnd, &bSucces);
+
+	if (bSucces)
+	{
+		HFONT hFont = CreateFontIndirect(cf.lpLogFont);
+		SaveHFont(hFont);
+		SendMessage(GetDlgItem(hWnd, IDC_TEXT_EDIT), WM_SETFONT, (WPARAM)hFont, NULL);
+		InvalidateRect(hWnd, NULL, FALSE);
+	}
 }
 
 static LPWSTR GetControlEditTextCopy(HWND hEditControl)
@@ -78,7 +83,7 @@ static DWORD GetExtraCreationFlags(DWORD checkState)
 
 	if (checkState == MF_CHECKED)
 	{
-		dwFlags = WS_HSCROLL;
+		dwFlags = WS_HSCROLL | ES_AUTOHSCROLL;
 	}
 
 	return dwFlags;
@@ -97,7 +102,7 @@ static HWND CreateNewControlEdit(HWND hWnd, DWORD checkState)
 		MSFTEDIT_CLASS,
 		NULL,
 		WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT |
-		ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL |
+		ES_MULTILINE | ES_AUTOVSCROLL |
 		ES_DISABLENOSCROLL | dwExtraFlags,
 		0, 0,
 		clientRect.right,
@@ -122,11 +127,11 @@ static void HandleWordWrap(HWND hWnd)
 	DestroyWindow(hEdit);
 
 	hEdit = CreateNewControlEdit(hWnd, checkState);
-	SendMessage(hEdit, WM_SETFONT, (WPARAM)hFont, NULL);
+	SetEditControlWindProc(hEdit);
 	SetWindowText(hEdit, lpszCopy);
+	SendMessage(hEdit, WM_SETFONT, (WPARAM)hFont, NULL);
 	free(lpszCopy);
 	RefreshZoom(hWnd);
-	SetEditControlWindProc(hEdit);
 
 	CheckMenuItem(hMenu, IDM_FORMAT_WORDWRAP, DecideCheckBasedOnState(checkState));
 }

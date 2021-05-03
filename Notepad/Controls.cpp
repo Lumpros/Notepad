@@ -8,27 +8,13 @@
 
 #define SIZEOF_ARR(arr)	sizeof(arr) / sizeof(arr[0])
 
-WNDPROC oldEditProcedure;
+WNDPROC   oldEditProcedure;
+int	      change_count       = 0;
+BOOL      isStatusBarEnabled = TRUE;
+HFONT     hCurrentFont       = NULL;
+const int dxStatusWidths[]   = { 0, 174, 64, 150, 150, -1 };
 
-int change_count = 0;
-
-BOOL isStatusBarEnabled = TRUE;
-
-const int dxStatusWidths[] = { 0, 174, 64, 150, 150, -1 };
-
-int iStatusWidths[SIZEOF_ARR(dxStatusWidths)];
-
-HFONT hCurrentFont = NULL;
-
-void SaveHFont(HFONT hFont)
-{
-	hCurrentFont = hFont;
-}
-
-HFONT RetrieveHFont(void)
-{
-	return hCurrentFont;
-}
+int       iStatusWidths[SIZEOF_ARR(dxStatusWidths)];
 
 // The first part is the only one that changes size as the window changes size
 // If the window is so small that the first part's with is 0, then the rest of
@@ -58,6 +44,16 @@ static void SetStatusWidths(HWND hWnd)
 		previousWidthsSum += dxStatusWidths[i - 1];
 		iStatusWidths[i] = dxStatusWidths[i] + part_width + previousWidthsSum;
 	}
+}
+
+void SaveHFont(HFONT hFont)
+{
+	hCurrentFont = hFont;
+}
+
+HFONT RetrieveHFont(void)
+{
+	return hCurrentFont;
 }
 
 BOOL HasChangedOriginalText(void)
@@ -129,6 +125,7 @@ static void HandlePossibleMouseZoom(HWND hWnd, WPARAM wParam)
 	}
 }
 
+
 LRESULT CALLBACK EditControlProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -147,6 +144,7 @@ LRESULT CALLBACK EditControlProcedure(HWND hWnd, UINT message, WPARAM wParam, LP
 	case WM_MBUTTONDBLCLK:
 	case EM_SETSEL:
 		HandleUndoButtonActivation(hWnd, message, wParam);
+		FixCaretPosition(hWnd);
 		if (SelectionHasChanged(message, lParam))
 		{
 			HandlePossibleTextSelect(hWnd, wParam, lParam);
@@ -155,7 +153,6 @@ LRESULT CALLBACK EditControlProcedure(HWND hWnd, UINT message, WPARAM wParam, LP
 		break;
 
 	case WM_MOUSEWHEEL:
-		
 		CallWindowProc(oldEditProcedure, hWnd, message, wParam, lParam);
 		HandlePossibleMouseZoom(hWnd, wParam);
 		return 0;

@@ -8,5 +8,5 @@ void HandleEditMenu(HWND hWnd, WPARAM wParam, LPARAM lParam);
 void HandlePossibleTextSelect(HWND hWnd, WPARAM wParam, LPARAM lParam);
 void EnableTextEditMenuItems(HWND hWnd, BOOL enabled);
 void SetLineColumnStatusBar(HWND hWnd);
-
+void FixCaretPosition(HWND hWnd);
 BOOL SelectionHasChanged(UINT message, LPARAM lParam);

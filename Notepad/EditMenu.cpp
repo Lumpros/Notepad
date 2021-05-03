@@ -13,6 +13,23 @@ static void iSwap(int* a, int* b)
 	*b = temp;
 }
 
+void FixCaretPosition(HWND hWnd)
+{
+	CHARRANGE cr;
+	SendMessage(hWnd, EM_EXGETSEL, NULL, (LPARAM)&cr);
+
+	if (cr.cpMin != cr.cpMax)
+	{
+		INT iTextLength = GetWindowTextLength(hWnd);
+
+		if (cr.cpMax == iTextLength)
+		{
+			--cr.cpMax;
+			SendMessage(hWnd, EM_EXSETSEL, NULL, (LPARAM)&cr);
+		}
+	}
+}
+
 void AppendText(LPWSTR newText, HWND mainhWnd)
 {
 	HWND hwndOutput = GetDlgItem(mainhWnd, IDC_TEXT_EDIT);
@@ -148,6 +165,7 @@ static void HandleSelectAll(HWND hWnd)
 
 	if (iTextLength > 0)
 	{
+		SetFocus(hEditControl);
 		SendMessage(hEditControl, EM_SETSEL, (WPARAM)0, (LPARAM)iTextLength);
 	}
 }
@@ -208,27 +226,31 @@ void EnableTextEditMenuItems(HWND hWnd, BOOL enabled)
 
 void HandlePossibleTextSelect(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	DWORD cbSelStart, cbSelEnd;
 	HWND parent = GetParent(hWnd);
 
-	SendMessage(hWnd, EM_GETSEL, (WPARAM)&cbSelStart, (LPARAM)&cbSelEnd);
+	CHARRANGE cr;
+	SendMessage(hWnd, EM_EXGETSEL, NULL, (LPARAM)&cr);
 
 	static BOOL areControlsEnabled = FALSE;
 
 	// Has selected some text
-	if (cbSelStart != cbSelEnd && !areControlsEnabled)
+	if (cr.cpMin != cr.cpMax)
 	{
-		areControlsEnabled = TRUE;
-		EnableTextEditMenuItems(parent, TRUE);
+		if (!areControlsEnabled)
+		{
+			areControlsEnabled = TRUE;
+			EnableTextEditMenuItems(parent, TRUE);
+		}
 	}
 
-	else if (cbSelStart == cbSelEnd && areControlsEnabled)
+	else if (areControlsEnabled)
 	{
 		areControlsEnabled = FALSE;
 		EnableTextEditMenuItems(parent, FALSE);
 	}
 }
 
+// TODO: Fix column bullshit when selecting multiple lines
 void SetLineColumnStatusBar(HWND hWnd)
 {
 	// because it is called from the wndproc of the edit control
@@ -238,12 +260,11 @@ void SetLineColumnStatusBar(HWND hWnd)
 	CHARRANGE cr;
 	SendMessage(hControl, EM_EXGETSEL, NULL, (LPARAM)&cr);
 
-	DWORD dwColumn = 0;// SendMessage(hControl, EM_LINELENGTH, cr.cpMin, NULL);
-
-	LRESULT dwLineIndex = SendMessage(hControl, EM_EXLINEFROMCHAR, 0, cr.cpMax);
+	LRESULT lLineIndex = SendMessage(hControl, EM_EXLINEFROMCHAR, 0, cr.cpMax);
+	LRESULT lColumn = cr.cpMax - SendMessage(hControl, EM_LINEINDEX, lLineIndex, NULL);
 
 	WCHAR buf[32];
-	wsprintf(buf, L" Ln %d, Col %d", dwLineIndex + 1, dwColumn + 1);
+	wsprintf(buf, L" Ln %d, Col %d", lLineIndex + 1, lColumn + 1);
 
 	HWND hStatusBar = GetDlgItem(hWnd, IDC_STATUS_BAR);
 	SendMessage(hStatusBar, SB_SETTEXT, 1, (LPARAM)buf);
