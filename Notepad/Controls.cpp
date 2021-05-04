@@ -262,7 +262,7 @@ static POINT GetClientDimensions(HWND hWnd)
 	return point;
 }
 
-static void ResizeMainEditControl(HWND hWnd, int width, int height)
+void ResizeMainEditControl(HWND hWnd, int width, int height)
 {
 	if (isStatusBarEnabled)
 		height -= GetStatusBarHeight(hWnd);
@@ -303,8 +303,21 @@ void HandleStatusBarResize(HWND hWnd)
 	SendMessage(sbhandle, WM_SIZE, 0, 0);
 }
 
+void HandleLineColumnTextOnResize(HWND hWnd)
+{
+	HMENU hMenu   = GetMenu(hWnd);
+	DWORD dwState = CheckMenuItem(hMenu, IDM_FORMAT_WORDWRAP, MF_BYCOMMAND);
+
+	if (dwState == MF_CHECKED)
+	{
+		HWND hEditControl = GetDlgItem(hWnd, IDC_TEXT_EDIT);
+		SetLineColumnStatusBar(hEditControl);
+	}
+}
+
 void HandleWindowResize(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	ResizeMainEditControl(hWnd, LOWORD(lParam), HIWORD(lParam));
 	HandleStatusBarResize(hWnd);
+	HandleLineColumnTextOnResize(hWnd);
 }

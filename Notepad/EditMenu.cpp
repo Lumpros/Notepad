@@ -57,26 +57,23 @@ static void UndoChanges(HWND hWnd)
 
 static void PasteText(HWND hWnd)
 {
-	if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
-		return;
-
-	if (!OpenClipboard(hWnd))
-		return;
-	
-	HGLOBAL hClipboard = GetClipboardData(CF_UNICODETEXT);
-
-	if (hClipboard != NULL)
+	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && OpenClipboard(hWnd))
 	{
-		LPWSTR data = (LPWSTR)GlobalLock(hClipboard);
+		HGLOBAL hClipboard = GetClipboardData(CF_UNICODETEXT);
 
-		if (data != NULL)
+		if (hClipboard != NULL)
 		{
-			InsertText(data, hWnd);
-			GlobalUnlock(data);
-		}
-	}
+			LPWSTR data = (LPWSTR)GlobalLock(hClipboard);
 
-	CloseClipboard();
+			if (data != NULL)
+			{
+				InsertText(data, hWnd);
+				GlobalUnlock(data);
+			}
+		}
+
+		CloseClipboard();
+	}
 }
 
 static void DeleteSelectedText(HWND hWnd)
@@ -109,9 +106,18 @@ static void CutSelectedText(HWND hWnd)
 	DeleteSelectedText(hWnd);
 }
 
-UINT_PTR CALLBACK FRWindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+UINT_PTR CALLBACK FindHookProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	return TRUE;
+	static LPFINDREPLACE lpfr = NULL;
+
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		lpfr = (LPFINDREPLACE)lParam;
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 // Don't forget to call free()
@@ -120,14 +126,15 @@ static FINDREPLACE GetFindStruct(HWND hWnd)
 	const BYTE size = 64;
 	LPWSTR lpstrFindWhat    = (LPWSTR)calloc(size, sizeof(WCHAR));
 
-	FINDREPLACE fr;
+	static FINDREPLACE fr;
 	ZeroMemory(&fr, sizeof(fr));
+
 	fr.lStructSize		= sizeof(fr);
-	fr.hwndOwner		= hWnd;
+	fr.hwndOwner        = hWnd;
 	fr.lpstrFindWhat	= lpstrFindWhat;
 	fr.wFindWhatLen		= size * sizeof(WCHAR);
-	fr.lpfnHook			= FRWindowProcedure;
-	fr.Flags			= FR_ENABLEHOOK;
+	fr.Flags            = FR_ENABLEHOOK;
+	fr.lpfnHook	        = FindHookProcedure;
 
 	return fr;
 }
@@ -135,9 +142,7 @@ static FINDREPLACE GetFindStruct(HWND hWnd)
 static void HandleFind(HWND hWnd)
 {
 	FINDREPLACE fr = GetFindStruct(hWnd);
-
 	FindText(&fr);
-
 	free(fr.lpstrFindWhat);
 }
 
