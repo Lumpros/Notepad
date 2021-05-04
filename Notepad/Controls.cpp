@@ -190,6 +190,8 @@ static HWND CreateMainEditControl(HWND hWnd, HINSTANCE hInstance)
 		NULL
 	);
 
+	SendMessage(editControlHandle, EM_SETLIMITTEXT, 0, 0);
+
 	SetEditControlWindProc(editControlHandle);
 
 	if (lstrcmpW(editclass, MSFTEDIT_CLASS) == 0)

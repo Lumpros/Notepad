@@ -113,6 +113,8 @@ static HWND CreateNewControlEdit(HWND hWnd, DWORD checkState)
 		NULL
 	);
 
+	SendMessage(hEdit, EM_SETLIMITTEXT, 0, 0);
+
 	return hEdit;
 }
 
