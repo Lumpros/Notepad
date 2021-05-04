@@ -57,26 +57,23 @@ static void UndoChanges(HWND hWnd)
 
 static void PasteText(HWND hWnd)
 {
-	if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
-		return;
-
-	if (!OpenClipboard(hWnd))
-		return;
-	
-	HGLOBAL hClipboard = GetClipboardData(CF_UNICODETEXT);
-
-	if (hClipboard != NULL)
+	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && OpenClipboard(hWnd))
 	{
-		LPWSTR data = (LPWSTR)GlobalLock(hClipboard);
+		HGLOBAL hClipboard = GetClipboardData(CF_UNICODETEXT);
 
-		if (data != NULL)
+		if (hClipboard != NULL)
 		{
-			InsertText(data, hWnd);
-			GlobalUnlock(data);
-		}
-	}
+			LPWSTR data = (LPWSTR)GlobalLock(hClipboard);
 
-	CloseClipboard();
+			if (data != NULL)
+			{
+				InsertText(data, hWnd);
+				GlobalUnlock(data);
+			}
+		}
+
+		CloseClipboard();
+	}
 }
 
 static void DeleteSelectedText(HWND hWnd)
@@ -268,7 +265,7 @@ void SetLineColumnStatusBar(HWND hWnd)
 	SendMessage(hControl, EM_EXGETSEL, NULL, (LPARAM)&cr);
 
 	LRESULT lLineIndex = SendMessage(hControl, EM_EXLINEFROMCHAR, 0, cr.cpMax);
-	LRESULT lColumn = cr.cpMax - SendMessage(hControl, EM_LINEINDEX, lLineIndex, NULL);
+	LRESULT lColumn    = cr.cpMax - SendMessage(hControl, EM_LINEINDEX, lLineIndex, NULL);
 
 	WCHAR buf[32];
 	wsprintf(buf, L" Ln %d, Col %d", lLineIndex + 1, lColumn + 1);

@@ -63,6 +63,30 @@ static void SetEditControlTextToFileData(HANDLE hFile, HWND hWnd)
 	free(wBuf);
 }
 
+static UINT FindLastSlash(LPCWSTR path)
+{
+	UINT pos = 0;
+
+	for (UINT i = lstrlen(path) - 1; i > 0; --i)
+	{
+		if (path[i] == L'\\' || path[i] == L'/')
+		{
+			pos = i;
+			break;
+		}
+	}
+
+	return pos;
+}
+
+static void SetWindowTitleAccordingToFileName(HWND hWnd, LPCWSTR lpstrTitle)
+{
+	WCHAR buf[296];
+	UINT uiLastSlashIndex = FindLastSlash(lpstrTitle);
+	wsprintfW(buf, L"%s - Notepad\0", lpstrTitle + uiLastSlashIndex + 1);
+	SetWindowText(hWnd, buf);
+}
+
 static void HandleOpenFile(HWND hWnd)
 {
 	BOOL success;
@@ -87,6 +111,7 @@ static void HandleOpenFile(HWND hWnd)
 
 		else
 		{
+			SetWindowTitleAccordingToFileName(hWnd, filename);
 			SetEditControlTextToFileData(hFile, hWnd);
 			CloseHandle(hFile);
 		}
@@ -115,22 +140,6 @@ static void CreateNewNotepadProcess(void)
 	CloseHandle(pi.hThread);
 }
 
-static UINT FindLastSlash(LPCWSTR path)
-{
-	UINT pos = 0;
-
-	for (UINT i = lstrlen(path) - 1; i > 0; --i)
-	{
-		if (path[i] == L'\\' || path[i] == L'/')
-		{
-			pos = i;
-			break;
-		}
-	}
-
-	return pos;
-}
-
 static void WriteEditControlTextToFile(HANDLE hFile, LPWSTR lpstrFileName, HWND hWnd)
 {
 	HWND hEditControl = GetDlgItem(hWnd, IDC_TEXT_EDIT);
@@ -141,14 +150,6 @@ static void WriteEditControlTextToFile(HANDLE hFile, LPWSTR lpstrFileName, HWND 
 	DWORD dwBytesWritten;
 	WriteFile(hFile, lpstrCopy, iTextLength * sizeof(WCHAR), &dwBytesWritten, NULL);
 	free(lpstrCopy);
-}
-
-static void SetWindowTitleAccordingToFileName(HWND hWnd, LPCWSTR lpstrTitle)
-{
-	WCHAR buf[296];
-	UINT uiLastSlashIndex = FindLastSlash(lpstrTitle);
-	wsprintfW(buf, L"%s - Notepad\0", lpstrTitle + uiLastSlashIndex + 1);
-	SetWindowText(hWnd, buf);
 }
 
 static void HandleSaveFile(HWND hWnd)
@@ -182,6 +183,31 @@ static void HandleSaveFile(HWND hWnd)
 	free(lpstrFile);
 }
 
+static void DoPageSetupDialog(HWND hWnd)
+{
+	PAGESETUPDLG psd;
+	ZeroMemory(&psd, sizeof(PAGESETUPDLG));
+
+	psd.lStructSize = sizeof(PAGESETUPDLG);
+	psd.hwndOwner   = hWnd;
+	psd.Flags       = PSD_DEFAULTMINMARGINS | PSD_INHUNDREDTHSOFMILLIMETERS;
+
+	PageSetupDlg(&psd);
+}
+
+static void DoPrintDialog(HWND hWnd)
+{
+	PRINTDLG pd;
+	ZeroMemory(&pd, sizeof(PRINTDLG));
+
+	pd.lStructSize = sizeof(PRINTDLG);
+	pd.hwndOwner = hWnd;
+	pd.Flags = PD_ALLPAGES | PD_DISABLEPRINTTOFILE;
+	pd.nCopies = 1;
+
+	PrintDlg(&pd);
+}
+
 void HandleFileMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam))
@@ -198,8 +224,17 @@ void HandleFileMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		CreateNewNotepadProcess();
 		break;
 
+	case IDM_FILE_SAVE_AS:
 	case IDM_FILE_SAVE:
 		HandleSaveFile(hWnd);
+		break;
+
+	case IDM_FILE_PAGE_SETUP:
+		DoPageSetupDialog(hWnd);
+		break;
+
+	case IDM_FILE_PRINT:
+		DoPrintDialog(hWnd);
 		break;
 	}
 }

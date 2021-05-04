@@ -52,7 +52,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR lp
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
-	MSG msg = { 0 };
+	MSG msg;
+	ZeroMemory(&msg, sizeof(msg));
+
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		if (!TranslateAccelerator(hWnd, hAccel, &msg))
