@@ -26,7 +26,7 @@ void HandleMenuCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	{
 		HandleEditMenu(hWnd, wParam, lParam);
 	}
-
+	
 	else if (IsInRange(ID, IDM_FORMAT_WORDWRAP, IDM_FORMAT_FONT))
 	{
 		HandleFormatMenu(hWnd, wParam, lParam);

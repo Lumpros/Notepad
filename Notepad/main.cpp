@@ -4,6 +4,7 @@
 #include "Menu.h"
 #include "Resource.h"
 #include "Identifiers.h"
+#include "EditMenu.h"
 
 #include <CommCtrl.h>
 

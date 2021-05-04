@@ -123,6 +123,8 @@ static void HandleWordWrap(HWND hWnd)
 	LPWSTR lpszCopy   = GetControlEditTextCopy(hEdit);
 	DWORD  checkState = CheckMenuItem(hMenu, IDM_FORMAT_WORDWRAP, MF_BYCOMMAND);
 	HFONT  hFont      = RetrieveHFont();
+	RECT   clientRect;
+	GetClientRect(hWnd, &clientRect);
 
 	DestroyWindow(hEdit);
 
@@ -132,7 +134,7 @@ static void HandleWordWrap(HWND hWnd)
 	SendMessage(hEdit, WM_SETFONT, (WPARAM)hFont, NULL);
 	free(lpszCopy);
 	RefreshZoom(hWnd);
-
+	ResizeMainEditControl(hWnd, clientRect.right, clientRect.bottom);
 	CheckMenuItem(hMenu, IDM_FORMAT_WORDWRAP, DecideCheckBasedOnState(checkState));
 }
 

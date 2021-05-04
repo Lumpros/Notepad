@@ -24,4 +24,6 @@ void SaveHFont(HFONT hFont);
 
 HFONT RetrieveHFont(void);
 
+void ResizeMainEditControl(HWND hWnd, int width, int height);
+
 void SetEditControlWindProc(HWND hEditControl);
