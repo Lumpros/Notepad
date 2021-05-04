@@ -224,8 +224,8 @@ void HandleFileMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		CreateNewNotepadProcess();
 		break;
 
-	case IDM_FILE_SAVE_AS:
 	case IDM_FILE_SAVE:
+	case IDM_FILE_SAVE_AS:
 		HandleSaveFile(hWnd);
 		break;
 
